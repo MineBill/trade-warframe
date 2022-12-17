@@ -1,9 +1,10 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const app = express();
-const { Sequelize } = require('sequelize');
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import { Sequelize } from "sequelize";
+
 dotenv.config();
+const app = express();
 const sequelize = new Sequelize(`mariadb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@localhost:3306/${process.env.DB_NAME}`)
 
 sequelize.authenticate().then(() => {
