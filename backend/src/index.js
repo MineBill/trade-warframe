@@ -7,12 +7,13 @@ dotenv.config();
 const app = express();
 const sequelize = new Sequelize(`mariadb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@localhost:3306/${process.env.DB_NAME}`)
 
-sequelize.authenticate().then(() => {
+try {
+    await sequelize.authenticate();
     console.log('Connection has been established successfully.');
     setup();
-}).catch(error => {
+} catch (error) {
     console.error('Unable to connect to the database:', error);
-});
+}
 
 function setup() {
     app.use(cors());
