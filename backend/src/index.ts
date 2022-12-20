@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { DataSource } from "typeorm";
 import { User } from "./models/User.js";
+import { Listing } from "./models/Listing.js";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const AppDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User],
+    entities: [User, Listing],
     synchronize: true
 });
 
@@ -23,7 +24,7 @@ try {
     console.log('Connection has been established successfully.');
     setup();
 } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Exception caught:', error);
 }
 
 async function setup() {
