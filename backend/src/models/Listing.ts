@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, Relation } from "typeorm";
 import { User } from "./User.js";
+import { Item } from "./Item.js";
 
 @Entity()
 export class Listing {
@@ -12,6 +13,8 @@ export class Listing {
     @Column()
     quantity: number = 0;
 
+    @ManyToOne(() => Item, item => item.listings)
+    item: Relation<Item>;
     @Column()
     price: number = 0;
 };
