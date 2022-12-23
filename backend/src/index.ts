@@ -52,7 +52,23 @@ async function setup() {
         return res.send(result[0]);
     })
 
+
     app.listen(process.env.PORT, () => {
         console.log(`Listening on port ${process.env.PORT}`)
     });
+    app.get("/item/:id", async (req, res) => {
+        const items = AppDataSource.getRepository(Item)
+        const numid = parseInt(req.params.id)
+
+        if (Number.isNaN(numid)) {
+            return res.status(400).send();
+        }
+
+        let result = await items.findBy({ id: numid });
+        if (result.length == 0) {
+            return res.status(404).send();
+        }
+
+        return res.send(result[0]);
+    })
 }
