@@ -1,7 +1,9 @@
 <template>
     <div class="listings_background">
         <div v-for="(listing, index) in listings" v-bind:key="index">
-            <Listing />
+            
+            <Listing :item="listing.item.name" :price="listing.price" :quantity="listing.quantity" :username="listing.user.name" />
+            
         </div>
     </div>
 </template>
