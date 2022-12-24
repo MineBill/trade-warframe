@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, Relation } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne, Relation, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User.js";
 import { Item } from "./Item.js";
 
@@ -15,6 +15,13 @@ export class Listing {
 
     @ManyToOne(() => Item, item => item.listings)
     item: Relation<Item>;
+
     @Column()
     price: number = 0;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 };

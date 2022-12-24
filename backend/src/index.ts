@@ -52,10 +52,32 @@ async function setup() {
         return res.send(result[0]);
     })
 
+    app.get("/listings/:max", async (req, res) => {
+        let max = parseInt(req.params.max)
+        if (Number.isNaN(max)) {
+            return res.status(400).send()
+        }
+
+        // Limit maximum listings to 25
+        if (max > 25) {
+            max = 25
+        }
+
+        const listings = AppDataSource.getRepository(Listing);
+        const result = await listings.find({
+            order: {
+                updatedAt: "DESC"
+            },
+            take: max
+        })
+        
+        return res.status(200).send(result)
+    })
 
     app.listen(process.env.PORT, () => {
         console.log(`Listening on port ${process.env.PORT}`)
-    });
+    })
+
     app.get("/item/:id", async (req, res) => {
         const items = AppDataSource.getRepository(Item)
         const numid = parseInt(req.params.id)

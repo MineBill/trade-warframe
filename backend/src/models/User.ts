@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Listing } from "./Listing.js";
 
 @Entity()
@@ -17,4 +17,10 @@ export class User {
 
     @OneToMany(() => Listing, listing => listing.user)
     listings: Listing[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 };
