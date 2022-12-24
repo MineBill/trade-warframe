@@ -5,7 +5,7 @@ import cors from "cors";
 import { DataSource } from "typeorm";
 import { User } from "./models/User.js";
 import { Listing } from "./models/Listing.js";
-import {Item } from "./models/Item.js"
+import { Item } from "./models/Item.js"
 
 dotenv.config();
 
@@ -68,9 +68,19 @@ async function setup() {
             order: {
                 updatedAt: "DESC"
             },
-            take: max
+            take: max,
+            relations: {
+                item: true,
+                user: true
+            }
         })
-        
+
+        result.map(entry => {
+            delete entry.user.passwordHash
+            delete entry.user.createdAt
+            delete entry.user.updatedAt
+        })
+
         return res.status(200).send(result)
     })
 
