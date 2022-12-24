@@ -1,5 +1,5 @@
 // TODO: Maybe there is a better place to put this setting
-const BASE_URL = 'http://localhost:3030';
+const BASE_URL = 'http://localhost:8082';
 
 export async function getAllListings(count = 25) {
     const response = await fetch(`${BASE_URL}/listings/${count}`);
