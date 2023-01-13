@@ -103,4 +103,12 @@ async function setup() {
 
         return res.send(result[0]);
     })
+
+    app.get("/items", async(req, res) => {
+        const items = AppDataSource.getRepository(Item);
+
+        let result = await items.find();
+
+        return res.send(result);
+    });
 }
