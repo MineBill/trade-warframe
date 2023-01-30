@@ -36,6 +36,17 @@ async function setup() {
         res.send("Hello, World");
     });
 
+    app.get("/listings/:byName", async (req, res) => {
+        const items = AppDataSource.getRepository(Item)
+        const byname = (req.params.byName)
+        let result = await items.find({where:{uniqueName:byname},relations:{listings:true}} );
+        if (result.length == 0) {
+            return res.status(404).send();
+        }
+        
+        return res.send(result[0].listings);
+    })
+
     app.get("/user/:id", async (req, res) => {
         const users = AppDataSource.getRepository(User)
         const numid = parseInt(req.params.id)
