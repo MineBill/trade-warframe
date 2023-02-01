@@ -36,16 +36,37 @@ async function setup() {
         res.send("Hello, World");
     });
 
-    app.get("/listings/:byName", async (req, res) => {
-        const items = AppDataSource.getRepository(Item)
-        const byname = (req.params.byName)
-        let result = await items.find({where:{uniqueName:byname},relations:{listings:true}} );
+    app.get("/listings/byName/:byName", async (req, res) => {
+        const byname = (req.params.byName);
+        const listings = AppDataSource.getRepository(Listing);
+        const result = await listings.find({
+            order: {
+                updatedAt: "DESC"
+            },
+            take: 25,
+            relations: {
+                item: true,
+                user: true
+            },
+            where: {
+                item: {
+                    uniqueName: byname
+                }
+            }
+        });
+
         if (result.length == 0) {
             return res.status(404).send();
         }
-        
-        return res.send(result[0].listings);
-    })
+
+        result.map(entry => {
+            delete entry.user.passwordHash
+            delete entry.user.createdAt
+            delete entry.user.updatedAt
+        });
+
+        return res.send(result);
+    });
 
     app.get("/user/:id", async (req, res) => {
         const users = AppDataSource.getRepository(User)
@@ -115,7 +136,7 @@ async function setup() {
         return res.send(result[0]);
     })
 
-    app.get("/items", async(req, res) => {
+    app.get("/items", async (req, res) => {
         const items = AppDataSource.getRepository(Item);
 
         let result = await items.find();
