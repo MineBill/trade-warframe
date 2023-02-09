@@ -1,6 +1,4 @@
 <template>
-
-
     <div class="listings_background">
         <div>
             <div style="margin: auto" class="fancy-input-group">
@@ -15,15 +13,15 @@
             </div>
             <div>
                 <div class="filter-input">
-                Quantity:
-                <input type="text" v-model="quantity_min" placeholder="min" />
-                <input type="text" v-model="quantity_max" placeholder="max" />
-            </div>
-            <div class="filter-input">
-                Price:
-                <input type="text" v-model="price_min" placeholder="min" />
-                <input type="text" v-model="price_max" placeholder="max" />
-            </div>
+                    Quantity:
+                    <input type="text" v-model="quantity_min" placeholder="min" />
+                    <input type="text" v-model="quantity_max" placeholder="max" />
+                </div>
+                <div class="filter-input">
+                    Price:
+                    <input type="text" v-model="price_min" placeholder="min" />
+                    <input type="text" v-model="price_max" placeholder="max" />
+                </div>
             </div>
             <button class="fancy-button" type="button" @click="searchBar">Search</button>
         </div>
@@ -34,7 +32,7 @@
     </div>
 </template>
 
-<script>
+<script >
 import { getAllListings, getListingsByName } from '@/services/DataService';
 import Listing from "@/components/Listing.vue";
 

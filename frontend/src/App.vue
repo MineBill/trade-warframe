@@ -1,16 +1,18 @@
 <template>
+  <NavagationBar />
   <DisplayListings :items="items" />
 </template>
 
 <script>
 import DisplayListings from './components/DisplayListings.vue'
+import NavagationBar from './components/NavagationBar.vue'
 import { getAllitems } from '@/services/DataService';
 
 export default {
   name: 'App',
   components: {
-    DisplayListings
-
+    DisplayListings,
+    NavagationBar
   },
   data: () => {
     return {
@@ -32,7 +34,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  padding: 10px 10px 10px 10px;
+  padding: 0px !important;
   width: -webkit-fill-available;
   width: -moz-available;
   height: 100%;
