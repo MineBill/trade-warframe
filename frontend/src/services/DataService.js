@@ -15,3 +15,13 @@ export async function getItem(id) {
     const response = await fetch(`${BASE_URL}/item/${id}`);
     return await response.json();
 }
+
+export async function getAllitems() {
+    const response = await fetch(`${BASE_URL}/items`);
+    return await response.json();
+}
+
+export async function getListingsByName(name) {
+    const response = await fetch(`${BASE_URL}/listings/byName/${name}`);
+    return await response.json();
+}
