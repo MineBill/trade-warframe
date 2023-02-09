@@ -38,6 +38,7 @@ export default {
   height: 100%;
   position: fixed;
   background-color: #ecf0f1;
+  overflow-y: scroll;
 }
 
 body {
