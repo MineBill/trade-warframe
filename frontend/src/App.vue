@@ -1,17 +1,12 @@
 <template>
-  <DisplayListings :items="items" />
+  <router-view></router-view>
 </template>
 
 <script>
-import DisplayListings from './components/DisplayListings.vue'
 import { getAllitems } from '@/services/DataService';
 
 export default {
   name: 'App',
-  components: {
-    DisplayListings
-
-  },
   data: () => {
     return {
       items: []
