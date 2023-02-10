@@ -188,6 +188,52 @@ async function setup() {
         return res.status(200).send({});
     });
 
+    app.put("/auth/login", async (req, res) => {
+        if (!req.body.email || !req.body.password) {
+            return res.status(400).send();
+        }
+        const email = req.body.email;
+        const password = req.body.password;
+
+        /* if (!verifyEmail(email)) {
+            return res.status(400).send({
+                "message": "Email is malformed."
+            });
+        } */
+
+        const users = AppDataSource.getRepository(User);
+        const result = await users.find({
+            where: { email: email }
+        });
+        if (result.length <= 0) {
+            return res.status(404).send({
+                message: "Email or password are wrong"
+            });
+        }
+
+        const user: User = result[0];
+
+        if (!comparePasswords(user.passwordHash, password, user.passwordSalt)) {
+            return res.status(404).send({
+                message: "Email or password are wrong"
+            });
+        }
+
+        delete user.passwordSalt;
+        delete user.passwordHash;
+
+        const token = generateJWT({ data: user });
+        const refreshExpiry = moment().utc().add(3, 'days').endOf('day').format('X');
+        const refreshtoken = generateJWT({ exp: parseInt(refreshExpiry), data: { id: user.id } });
+        delete user.passwordHash;
+
+        return res.status(200).send({
+            data: user,
+            token: token,
+            refreshtoken: refreshtoken
+        });
+    });
+
     app.use(function(err: any, _req: any, res: any, next: any) {
         console.log("LOL");
         if (err.name === "UnauthorizedError") {
