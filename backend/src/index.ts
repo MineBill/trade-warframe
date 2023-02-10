@@ -189,17 +189,13 @@ async function setup() {
     });
 
     app.put("/auth/login", async (req, res) => {
-        if (!req.body.email || !req.body.password) {
-            return res.status(400).send();
-        }
-        const email = req.body.email;
-        const password = req.body.password;
+        const { email, password } = req.body;
 
-        /* if (!verifyEmail(email)) {
+        if (!verifyEmail(email)) {
             return res.status(400).send({
-                "message": "Email is malformed."
+                message: "Email or password are malformed."
             });
-        } */
+        }
 
         const users = AppDataSource.getRepository(User);
         const result = await users.find({
@@ -234,7 +230,7 @@ async function setup() {
         });
     });
 
-    app.use(function(err: any, _req: any, res: any, next: any) {
+    app.use(function (err: any, _req: any, res: any, next: any) {
         console.log("LOL");
         if (err.name === "UnauthorizedError") {
             res.status(401).send({ message: "Invalid Token" });
