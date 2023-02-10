@@ -36,3 +36,13 @@ export async function registerUser(data) {
     });
     return await response.json();
 }
+
+export async function loginUser(data) {
+    console.log(data);
+    const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
