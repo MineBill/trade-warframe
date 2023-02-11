@@ -1,5 +1,3 @@
-import { getToken } from "./DataStore.js";
-
 // TODO: Maybe there is a better place to put this setting
 const BASE_URL = 'http://localhost:8082';
 
@@ -31,14 +29,13 @@ export async function getListingsByName(name) {
 export async function registerUser(data) {
     const response = await fetch(`${BASE_URL}/auth/register`, {
         method: "PUT",
-        headers: { Authentication: `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
     return await response.json();
 }
 
 export async function loginUser(data) {
-    console.log(data);
     const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
