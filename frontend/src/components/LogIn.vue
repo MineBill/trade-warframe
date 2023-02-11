@@ -20,7 +20,6 @@
 
 <script>
 import { loginUser } from '@/services/DataService';
-import { setToken } from '@/services/DataStore';
 
 export default {
     name: 'LogIn',
@@ -47,9 +46,9 @@ export default {
                     return;
                 }
 
-                setToken(response.token);
-                console.log(response.token);
-                console.log(response.data);
+                this.$store.commit("setToken", response.token);
+                this.$store.commit("setUserData", response.data);
+                this.$router.push("/");
             });
         }
     },

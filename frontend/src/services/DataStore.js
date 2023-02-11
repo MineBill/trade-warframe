@@ -1,11 +1,20 @@
-export async function getToken() {
-    return localStorage.getItem("token");
-}
+import { createStore } from "vuex";
 
-export async function setToken() {
-    localStorage.setItem("token");
-}
+const store = createStore({
+    state() {
+        return {
+            token: "",
+            user: {}
+        };
+    },
+    mutations: {
+        setToken(state, token) {
+            state.token = token;
+        },
+        setUserData(state, data) {
+            state.user = data;
+        },
+    }
+});
 
-export async function hasToken() {
-    return localStorage.getItem("token") != null;
-}
+export default store;

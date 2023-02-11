@@ -5,6 +5,7 @@ import DisplayListings from "./components/DisplayListings.vue"
 import Register from "./components/Register.vue"
 import LogIn from "./components/LogIn.vue"
 import "./assets/main.css"
+import store from "./services/DataStore"
 
 const routes = [
     { path: '/', component: DisplayListings },
@@ -17,4 +18,4 @@ const router = createRouter({
     routes,
 })
 
-createApp(App).use(router).mount('#app');
+createApp(App).use(store).use(router).mount('#app');

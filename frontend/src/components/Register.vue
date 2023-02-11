@@ -52,7 +52,10 @@ export default {
             }).then((response) => {
                 if (response.message) {
                     this.error = response.message;
+                    return;
                 }
+
+                this.$router.push("/login");
             });
         }
     },
