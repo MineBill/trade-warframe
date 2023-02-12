@@ -46,8 +46,10 @@ export default {
                     return;
                 }
 
-                this.$store.commit("setToken", response.token);
-                this.$store.commit("setUserData", response.data);
+                this.$store.commit("setLoginData", {
+                    user: response.data,
+                    token: response.token
+                });
                 this.$router.push("/");
             });
         }

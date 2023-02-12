@@ -1,16 +1,21 @@
 <template>
+  <NavigationBar />
   <router-view></router-view>
 </template>
 
 <script>
 import { getAllitems } from '@/services/DataService';
+import NavigationBar from "@/components/NavigationBar.vue"
 
 export default {
   name: 'App',
+  components: {
+    NavigationBar
+  },
   data: () => {
     return {
       items: []
-    }
+    };
   },
   mounted() {
     getAllitems().then(data => {
@@ -27,7 +32,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  padding: 10px 10px 10px 10px;
+  padding: 0px;
   width: -webkit-fill-available;
   width: -moz-available;
   height: 100%;

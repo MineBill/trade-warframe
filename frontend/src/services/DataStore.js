@@ -4,17 +4,28 @@ const store = createStore({
     state() {
         return {
             token: "",
+            loggedIn: false,
             user: {}
         };
     },
     mutations: {
-        setToken(state, token) {
-            state.token = token;
+        setLoginData(state, data) {
+            state.token = data.token;
+            state.user = data.user;
+            state.loggedIn = true;
+
+            localStorage.setItem("persist", JSON.stringify({
+                user: state.user,
+                token: state.token
+            }));
         },
-        setUserData(state, data) {
-            state.user = data;
-        },
-    }
+        clearLoginData(state) {
+            state.token = "";
+            state.user = {};
+            state.loggedIn = false;
+            localStorage.clear();
+        }
+    },
 });
 
 export default store;
