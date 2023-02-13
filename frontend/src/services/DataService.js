@@ -25,3 +25,21 @@ export async function getListingsByName(name) {
     const response = await fetch(`${BASE_URL}/listings/byName/${name}`);
     return await response.json();
 }
+
+export async function registerUser(data) {
+    const response = await fetch(`${BASE_URL}/auth/register`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
+export async function loginUser(data) {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}

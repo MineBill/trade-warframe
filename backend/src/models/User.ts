@@ -13,6 +13,9 @@ export class User {
     passwordHash: string = "";
 
     @Column()
+    passwordSalt: string = "";
+
+    @Column()
     email: string = "";
 
     @OneToMany(() => Listing, listing => listing.user)
