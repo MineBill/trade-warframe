@@ -187,20 +187,34 @@ async function setup() {
         return res.send(result);
     });
 
-    app.get("/user/:id", async (req, res) => {
-        const users = AppDataSource.getRepository(User)
-        const numid = parseInt(req.params.id)
-
-        if (Number.isNaN(numid)) {
-            return res.status(400).send();
+    app.get("/user/:id", authFilter, async (req: JWTRequest, res) => {
+        const id = parseInt(req.params.id);
+        if (Number.isNaN(id)) {
+            return res.status(400).send({message: "User id must be a number"});
         }
 
-        let result = await users.findBy({ id: numid });
-        if (result.length == 0) {
-            return res.status(404).send();
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { id: id } });
+        if (user == null) {
+            return res.status(400).send({message: "User id is invalid"});
         }
 
-        return res.send(result[0]);
+        const listings = AppDataSource.getRepository(Listing);
+        const result = await listings.find({ where: { deleted: false, user: { id: user.id } } });
+        user.listings = result;
+
+        delete user.passwordHash;
+        delete user.passwordSalt;
+
+        if (id == req.auth.data.id) {
+            return res.status(200).send(user);
+        }
+
+        delete user.email;
+        delete user.createdAt;
+        delete user.updatedAt;
+
+        return res.status(200).send(user);
     })
 
     app.get("/listings/:max", async (req, res) => {
