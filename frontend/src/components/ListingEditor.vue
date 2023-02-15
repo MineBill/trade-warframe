@@ -3,8 +3,8 @@
         <div class="container">
             <h1>{{ getMode() }} listing</h1>
             <form id="lol" @submit.prevent="verifyOptions">
-                <vue-select v-model="selectedItem" searchable :model-value="items[0]" label-by="name" :options="items"
-                    close-on-select :min="1"></vue-select>
+                <vue-select v-model="selectedItem" searchable label-by="name" :options="items" close-on-select
+                    :min="1"></vue-select>
                 <div class="element">
                     <label for="">Quantity</label>
                     <input class="fancy-input" type="text" name="quantity" v-model="quantity">
@@ -16,8 +16,7 @@
                 <div class="element">
                     <label for="">Type</label>
                     <p></p>
-                    <vue-select v-model="typeString" model-value="Sell" :options="['Sell', 'Buy']" close-on-select
-                        :min="1"></vue-select>
+                    <vue-select v-model="typeString" :options="['Sell', 'Buy']" close-on-select :min="1"></vue-select>
                 </div>
                 <button class="fancy-button">Complete</button>
             </form>
@@ -84,7 +83,22 @@ export default {
                 return;
             }
 
-            this.$emit('completed', { item: this.selectedItem.unique, price: this.price, quantity: this.quantity, typeString: this.typeString });
+            if (this.selectedItem == undefined || this.selectedItem == "") {
+                this.error = "Item not set or is incorrect";
+                return;
+            }
+
+            if (this.typeString == undefined || this.typeString == "") {
+                this.error = "Type not set or is incorrect";
+                return;
+            }
+
+            this.$emit('completed', {
+                itemName: this.selectedItem.unique,
+                price: this.price,
+                quantity: this.quantity,
+                type: this.typeString.toUpperCase()
+            });
         }
     }
 }

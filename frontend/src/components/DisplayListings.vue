@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { getAllListings, getListingsByName } from '@/services/DataService';
+import { getAllListings, getListingsByName, createListing } from '@/services/DataService';
 import Listing from "@/components/Listing.vue";
 import ListingEditor from "@/components/ListingEditor.vue"
 
@@ -70,8 +70,11 @@ export default {
         },
 
         listingEditorCompleted(data) {
-            data;
             this.showListingEditor = false;
+            createListing(data).then(response => {
+                console.log(response);
+                this.$router.go();
+            });
         },
 
         searchBar: function () {
