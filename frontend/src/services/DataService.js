@@ -1,3 +1,4 @@
+import store from "./DataStore.js"
 // TODO: Maybe there is a better place to put this setting
 const BASE_URL = 'http://localhost:8082';
 
@@ -39,6 +40,33 @@ export async function loginUser(data) {
     const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
+export async function createListing(data) {
+    const response = await fetch(`${BASE_URL}/listings`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${store.state.token}` },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
+export async function modifyListing(data) {
+    const response = await fetch(`${BASE_URL}/listings`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${store.state.token}` },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}
+
+export async function deleteListing(data) {
+    const response = await fetch(`${BASE_URL}/listings`, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${store.state.token}` },
         body: JSON.stringify(data)
     });
     return await response.json();
