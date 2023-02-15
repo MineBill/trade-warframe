@@ -6,7 +6,7 @@ import cors from "cors";
 import { expressjwt, Request as JWTRequest } from "express-jwt";
 import { DataSource } from "typeorm";
 import { User } from "./models/User.js";
-import { Listing } from "./models/Listing.js";
+import { Listing, ListingType } from "./models/Listing.js";
 import { Item } from "./models/Item.js"
 import { verifyJWT, generateJWT, hashPassword, comparePasswords } from "./utils.js"
 
@@ -41,6 +41,49 @@ async function setup() {
 
     app.get("/", (_req, res) => {
         res.send("Hello, World");
+    });
+
+    app.post("/listings", authFilter, async (req: JWTRequest, res) => {
+        // console.log(req.auth);
+        // return res.send({ message: "OK" });
+
+        const { itemName, quantity, price, type } = req.body;
+
+        if (price == null || price <= 0) {
+            return res.status(400).send({ message: "Invalid price number" });
+        }
+
+        if (quantity == null || quantity <= 0) {
+            return res.status(400).send({ message: "Invalid quantity number" });
+        }
+
+        if (type != "BUY" && type != "SELL") {
+            return res.status(400).send({ message: "Invalid type for listing" });
+        }
+
+        const items = AppDataSource.getRepository(Item);
+        const item = await items.findOne({ where: { uniqueName: itemName } });
+        if (item == null) {
+            return res.status(400).send({ message: "Item does not exist" });
+        }
+
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { id: req.auth.data.id } });
+        if (user == null) {
+            return res.status(400).send({ message: "Invalid user id" });
+        }
+
+        const listing = new Listing();
+        listing.user = user;
+        listing.price = price;
+        listing.quantity = quantity;
+        listing.type = type as ListingType;
+        listing.item = item;
+
+        const listings = AppDataSource.getRepository(Listing);
+        listings.save(listing);
+
+        return res.status(200).send({});
     });
 
     app.get("/listings/byName/:byName", async (req, res) => {
