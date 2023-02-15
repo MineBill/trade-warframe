@@ -44,10 +44,7 @@ async function setup() {
     });
 
     app.post("/listings", authFilter, async (req: JWTRequest, res) => {
-        // console.log(req.auth);
-        // return res.send({ message: "OK" });
-
-        const { itemName, quantity, price, type } = req.body;
+         const { itemName, quantity, price, type } = req.body;
 
         if (price == null || price <= 0) {
             return res.status(400).send({ message: "Invalid price number" });
@@ -81,6 +78,53 @@ async function setup() {
         listing.item = item;
 
         const listings = AppDataSource.getRepository(Listing);
+        listings.save(listing);
+
+        return res.status(200).send({});
+    });
+
+    app.put("/listings", authFilter, async (req: JWTRequest, res) => {
+        const { listingId, itemName, quantity, price, type } = req.body;
+
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { id: req.auth.data.id } });
+        if (user == null) {
+            return res.status(400).send({ message: "Invalid user id" });
+        }
+
+        const listings = AppDataSource.getRepository(Listing);
+        const listing = await listings.findOne({ where: { id: listingId }, relations: { user: true } });
+        if (listing == null) {
+            return res.status(400).send({ message: "Invalid listing id" });
+        }
+
+        if (listing.user.id != user.id) {
+            return res.status(403).send({ message: "Cannot modify a listing you do not own" });
+        }
+
+        if (price == null || price <= 0) {
+            return res.status(400).send({ message: "Invalid price number" });
+        }
+
+        if (quantity == null || quantity <= 0) {
+            return res.status(400).send({ message: "Invalid quantity number" });
+        }
+
+        if (type != "BUY" && type != "SELL") {
+            return res.status(400).send({ message: "Invalid type for listing" });
+        }
+
+        const items = AppDataSource.getRepository(Item);
+        const item = await items.findOne({ where: { uniqueName: itemName } });
+        if (item == null) {
+            return res.status(400).send({ message: "Item does not exist" });
+        }
+
+        listing.price = price;
+        listing.quantity = quantity;
+        listing.item = item;
+        listing.type = type;
+
         listings.save(listing);
 
         return res.status(200).send({});
