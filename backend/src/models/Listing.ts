@@ -33,4 +33,11 @@ export class Listing {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+
+    @Column()
+    completed: boolean = false;
+
+    @Column()
+    deleted: boolean = false;
 };
