@@ -44,7 +44,7 @@ async function setup() {
     });
 
     app.post("/listings", authFilter, async (req: JWTRequest, res) => {
-         const { itemName, quantity, price, type } = req.body;
+        const { itemName, quantity, price, type } = req.body;
 
         if (price == null || price <= 0) {
             return res.status(400).send({ message: "Invalid price number" });
@@ -130,6 +130,29 @@ async function setup() {
         return res.status(200).send({});
     });
 
+    app.delete("/listings", authFilter, async (req: JWTRequest, res) => {
+        const { id } = req.body;
+
+        const listings = AppDataSource.getRepository(Listing);
+        const listing = await listings.findOne({ where: { id: id }, relations: { user: true } });
+        if (listing == null) {
+            return res.status(400).send({ message: "Listing with id does not exist" });
+        }
+
+        if (listing.user.id != req.auth.data.id) {
+            return res.status(403).send({ message: "User does not own the listing" });
+        }
+
+        listing.deleted = true;
+        if (req.body.completed != undefined) {
+            listing.completed = req.body.completed;
+        }
+
+        listings.save(listing);
+        return res.status(200).send({});
+    });
+
+
     app.get("/listings/byName/:byName", async (req, res) => {
         const byname = (req.params.byName);
         const listings = AppDataSource.getRepository(Listing);
@@ -145,7 +168,9 @@ async function setup() {
             where: {
                 item: {
                     uniqueName: byname
-                }
+
+                },
+                deleted: false
             }
         });
 
@@ -191,6 +216,9 @@ async function setup() {
 
         const listings = AppDataSource.getRepository(Listing);
         const result = await listings.find({
+            where: {
+                deleted: false
+            },
             order: {
                 updatedAt: "DESC"
             },
