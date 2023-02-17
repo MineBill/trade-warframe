@@ -6,7 +6,7 @@ import cors from "cors";
 import { expressjwt, Request as JWTRequest } from "express-jwt";
 import { DataSource } from "typeorm";
 import { User } from "./models/User.js";
-import { Listing } from "./models/Listing.js";
+import { Listing, ListingType } from "./models/Listing.js";
 import { Item } from "./models/Item.js"
 import { verifyJWT, generateJWT, hashPassword, comparePasswords } from "./utils.js"
 
@@ -43,6 +43,120 @@ async function setup() {
         res.send("Hello, World");
     });
 
+    app.post("/listings", authFilter, async (req: JWTRequest, res) => {
+        const { itemName, quantity, price, type } = req.body;
+
+        if (price == null || price <= 0) {
+            return res.status(400).send({ message: "Invalid price number" });
+        }
+
+        if (quantity == null || quantity <= 0) {
+            return res.status(400).send({ message: "Invalid quantity number" });
+        }
+
+        if (type != "BUY" && type != "SELL") {
+            return res.status(400).send({ message: "Invalid type for listing" });
+        }
+
+        const items = AppDataSource.getRepository(Item);
+        const item = await items.findOne({ where: { uniqueName: itemName } });
+        if (item == null) {
+            return res.status(400).send({ message: "Item does not exist" });
+        }
+
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { id: req.auth.data.id } });
+        if (user == null) {
+            return res.status(400).send({ message: "Invalid user id" });
+        }
+
+        const listing = new Listing();
+        listing.user = user;
+        listing.price = price;
+        listing.quantity = quantity;
+        listing.type = type as ListingType;
+        listing.item = item;
+
+        const listings = AppDataSource.getRepository(Listing);
+        listings.save(listing);
+
+        return res.status(200).send({});
+    });
+
+    app.put("/listings", authFilter, async (req: JWTRequest, res) => {
+        const { listingId, itemName, quantity, price, type } = req.body;
+
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { id: req.auth.data.id } });
+        if (user == null) {
+            return res.status(400).send({ message: "Invalid user id" });
+        }
+
+        if (listingId <= 0 || listingId == undefined) {
+            return res.status(400).send({ message: "Invalid listing id" });
+        }
+
+        const listings = AppDataSource.getRepository(Listing);
+        const listing = await listings.findOne({ where: { id: listingId }, relations: { user: true } });
+        if (listing == null) {
+            return res.status(400).send({ message: "Invalid listing id" });
+        }
+
+        if (listing.user.id != user.id) {
+            return res.status(403).send({ message: "Cannot modify a listing you do not own" });
+        }
+
+        if (price == null || price <= 0) {
+            return res.status(400).send({ message: "Invalid price number" });
+        }
+
+        if (quantity == null || quantity <= 0) {
+            return res.status(400).send({ message: "Invalid quantity number" });
+        }
+
+        if (type != "BUY" && type != "SELL") {
+            return res.status(400).send({ message: "Invalid type for listing" });
+        }
+
+        const items = AppDataSource.getRepository(Item);
+        const item = await items.findOne({ where: { uniqueName: itemName } });
+        if (item == null) {
+            return res.status(400).send({ message: "Item does not exist" });
+        }
+
+        listing.price = price;
+        listing.quantity = quantity;
+        listing.item = item;
+        listing.type = type;
+
+        listings.save(listing);
+
+        return res.status(200).send({});
+    });
+
+    app.delete("/listings", authFilter, async (req: JWTRequest, res) => {
+        const { id } = req.body;
+
+        const listings = AppDataSource.getRepository(Listing);
+        const listing = await listings.findOne({ where: { id: id }, relations: { user: true } });
+        if (listing == null) {
+            return res.status(400).send({ message: "Listing with id does not exist" });
+        }
+
+        if (listing.user.id != req.auth.data.id) {
+            return res.status(403).send({ message: "User does not own the listing" });
+        }
+
+        listing.deleted = true;
+        if (req.body.completed != undefined) {
+            listing.completed = req.body.completed;
+        }
+
+        listings.save(listing);
+        return res.status(200).send({});
+    });
+
+
     app.get("/listings/byName/:byName", async (req, res) => {
         const byname = (req.params.byName);
         const listings = AppDataSource.getRepository(Listing);
@@ -58,7 +172,9 @@ async function setup() {
             where: {
                 item: {
                     uniqueName: byname
-                }
+
+                },
+                deleted: false
             }
         });
 
@@ -75,20 +191,31 @@ async function setup() {
         return res.send(result);
     });
 
-    app.get("/user/:id", async (req, res) => {
-        const users = AppDataSource.getRepository(User)
-        const numid = parseInt(req.params.id)
+    app.get("/user/:name", authFilter, async (req: JWTRequest, res) => {
+        const name = req.params.name;
 
-        if (Number.isNaN(numid)) {
-            return res.status(400).send();
+        const users = AppDataSource.getRepository(User);
+        const user = await users.findOne({ where: { name: name } });
+        if (user == null) {
+            return res.status(400).send({message: "User id is invalid"});
         }
 
-        let result = await users.findBy({ id: numid });
-        if (result.length == 0) {
-            return res.status(404).send();
+        const listings = AppDataSource.getRepository(Listing);
+        const result = await listings.find({ where: { deleted: false, user: { id: user.id } }, relations: { item: true, user: true } });
+        user.listings = result;
+
+        delete user.passwordHash;
+        delete user.passwordSalt;
+
+        if (user.id == req.auth.data.id) {
+            return res.status(200).send(user);
         }
 
-        return res.send(result[0]);
+        delete user.email;
+        delete user.createdAt;
+        delete user.updatedAt;
+
+        return res.status(200).send(user);
     })
 
     app.get("/listings/:max", async (req, res) => {
@@ -104,6 +231,9 @@ async function setup() {
 
         const listings = AppDataSource.getRepository(Listing);
         const result = await listings.find({
+            where: {
+                deleted: false
+            },
             order: {
                 updatedAt: "DESC"
             },

@@ -4,39 +4,39 @@
     <div class="listings_background">
         <div>
             <div style="margin: auto" class="fancy-input-group">
-                <svg class="fancy-input-icon" aria-hidden="true" viewBox="0 0 24 24">
-                    <g>
-                        <path
-                            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
-                        </path>
-                    </g>
-                </svg>
                 <input class="fancy-input" type="search" v-model="input" placeholder="Search here any item..." />
             </div>
             <div>
                 <div class="filter-input">
-                Quantity:
-                <input type="text" v-model="quantity_min" placeholder="min" />
-                <input type="text" v-model="quantity_max" placeholder="max" />
-            </div>
-            <div class="filter-input">
-                Price:
-                <input type="text" v-model="price_min" placeholder="min" />
-                <input type="text" v-model="price_max" placeholder="max" />
-            </div>
+                    Quantity:
+                    <input type="text" v-model="quantity_min" placeholder="min" />
+                    <input type="text" v-model="quantity_max" placeholder="max" />
+                </div>
+                <div class="filter-input">
+                    Price:
+                    <input type="text" v-model="price_min" placeholder="min" />
+                    <input type="text" v-model="price_max" placeholder="max" />
+                </div>
             </div>
             <button class="fancy-button" type="button" @click="searchBar">Search</button>
+            <button class="fancy-button" type="button" @click="newListing">New Listing</button>
         </div>
-        <div v-for="(listing, index) in listings" v-bind:key="index">
-            <Listing :item="listing.item.uniqueName" :price="listing.price" :quantity="listing.quantity"
-                :userName="listing.user.name" />
+        <div v-for="(listing, index) in items" v-bind:key="index">
+            <Listing :itemDefault="listing.item.uniqueName" :priceDefault="listing.price" :quantityDefault="listing.quantity"
+                :userName="listing.user.name" :typeDefault="listing.type" :id="listing.id" :ownsListing="listing.user.id == this.$store.state.user.id"/>
         </div>
+        <div v-if="items == undefined || items.length == 0">
+            No listings to display
+        </div>
+        <ListingEditor v-if="showListingEditor" :isModifying="false" @canceled="hideListingEditor"
+            @completed="listingEditorCompleted" />
     </div>
 </template>
 
 <script>
-import { getAllListings, getListingsByName } from '@/services/DataService';
+import { getListingsByName, createListing } from '@/services/DataService';
 import Listing from "@/components/Listing.vue";
+import ListingEditor from "@/components/ListingEditor.vue"
 
 export default {
     name: 'DisplayListings',
@@ -48,20 +48,33 @@ export default {
             quantity_max: 0,
             price_min: 0,
             price_max: 0,
+            showListingEditor: false,
         };
     },
     props: {
         items: Array
     },
-    mounted() {
-        getAllListings(25).then(data => {
-            this.listings = data
-        })
-    },
     components: {
-        Listing
+        Listing,
+        ListingEditor
     },
     methods: {
+        newListing() {
+            this.showListingEditor = true;
+        },
+
+        hideListingEditor() {
+            this.showListingEditor = false;
+        },
+
+        listingEditorCompleted(data) {
+            this.showListingEditor = false;
+            createListing(data).then(response => {
+                console.log(response);
+                this.$router.go();
+            });
+        },
+
         searchBar: function () {
             if (this.input.length) {
                 for (let item of this.items) {
