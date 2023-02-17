@@ -52,7 +52,7 @@ export default {
             item: this.itemDefault,
             quantity: this.quantityDefault,
             price: this.priceDefault,
-            type: this.typeDefaultf,
+            type: this.typeDefault,
             typeSell: false,
             typeBuy: false,
             error: "",
@@ -65,6 +65,13 @@ export default {
     mounted() {
         getAllitems().then(data => {
             this.items = data.map(item => { return { name: item.displayName, unique: item.uniqueName } });
+            const index = this.items.findIndex(i => i.unique == this.item);
+            this.selectedItem = this.items[index];
+            if (this.type != "" || this.type != undefined) {
+                this.typeString = this.type.toLowerCase();
+                this.typeString = this.typeString[0].toUpperCase() + this.typeString.substring(1);
+                console.log(this.typeString);
+            }
         });
     },
     methods: {
@@ -94,7 +101,10 @@ export default {
             }
 
             this.$emit('completed', {
-                itemName: this.selectedItem.unique,
+                item: {
+                    uniqueName: this.selectedItem.unique,
+                    displayName: this.selectedItem.name,
+                },
                 price: this.price,
                 quantity: this.quantity,
                 type: this.typeString.toUpperCase()
