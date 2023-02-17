@@ -7,7 +7,7 @@
                 <button @click="register" class="fancy-button">Register</button>
             </div>
             <div v-else>
-                <div class="username">{{ userData.name }}</div>
+                <router-link :to="{name: 'profile', params: {name: userData.name}}" class="username">{{ userData.name }}</router-link>
                 <button @click="logout" class="fancy-button">Logout</button>
             </div>
             <div>{{response}}</div>
