@@ -22,10 +22,10 @@
             <button class="fancy-button" type="button" @click="newListing">New Listing</button>
         </div>
         <div v-for="(listing, index) in listings" v-bind:key="index">
-            <Listing :item="listing.item.uniqueName" :price="listing.price" :quantity="listing.quantity"
-                :userName="listing.user.name" />
+            <Listing :itemDefault="listing.item.uniqueName" :priceDefault="listing.price" :quantityDefault="listing.quantity"
+                :userName="listing.user.name" :typeDefault="listing.type" :id="listing.id" :ownsListing="listing.user.id == this.$store.state.user.id"/>
         </div>
-        <ListingEditor v-if="showListingEditor" :isModifying="true" @canceled="hideListingEditor"
+        <ListingEditor v-if="showListingEditor" :isModifying="false" @canceled="hideListingEditor"
             @completed="listingEditorCompleted" />
     </div>
 </template>
@@ -45,7 +45,7 @@ export default {
             quantity_max: 0,
             price_min: 0,
             price_max: 0,
-            showListingEditor: false
+            showListingEditor: false,
         };
     },
     props: {

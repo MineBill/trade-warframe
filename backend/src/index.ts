@@ -92,6 +92,10 @@ async function setup() {
             return res.status(400).send({ message: "Invalid user id" });
         }
 
+        if (listingId <= 0 || listingId == undefined) {
+            return res.status(400).send({ message: "Invalid listing id" });
+        }
+
         const listings = AppDataSource.getRepository(Listing);
         const listing = await listings.findOne({ where: { id: listingId }, relations: { user: true } });
         if (listing == null) {
