@@ -21,9 +21,12 @@
             <button class="fancy-button" type="button" @click="searchBar">Search</button>
             <button class="fancy-button" type="button" @click="newListing">New Listing</button>
         </div>
-        <div v-for="(listing, index) in listings" v-bind:key="index">
+        <div v-for="(listing, index) in items" v-bind:key="index">
             <Listing :itemDefault="listing.item.uniqueName" :priceDefault="listing.price" :quantityDefault="listing.quantity"
                 :userName="listing.user.name" :typeDefault="listing.type" :id="listing.id" :ownsListing="listing.user.id == this.$store.state.user.id"/>
+        </div>
+        <div v-if="items == undefined || items.length == 0">
+            No listings to display
         </div>
         <ListingEditor v-if="showListingEditor" :isModifying="false" @canceled="hideListingEditor"
             @completed="listingEditorCompleted" />
@@ -31,7 +34,7 @@
 </template>
 
 <script>
-import { getAllListings, getListingsByName, createListing } from '@/services/DataService';
+import { getListingsByName, createListing } from '@/services/DataService';
 import Listing from "@/components/Listing.vue";
 import ListingEditor from "@/components/ListingEditor.vue"
 
@@ -50,11 +53,6 @@ export default {
     },
     props: {
         items: Array
-    },
-    mounted() {
-        getAllListings(25).then(data => {
-            this.listings = data
-        })
     },
     components: {
         Listing,

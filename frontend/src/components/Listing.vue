@@ -24,7 +24,7 @@
           </div>
           <div style="height: fit-content">
             <hr />
-            <router-link to="/profile" class="username">{{ userName }}</router-link>
+            <router-link :to="{name: 'profile', params: {name: userName}}" class="username">{{ userName }}</router-link>
             <div class="buttons" v-if="ownsListing">
               <button class="fancy-button space" @click="soldListing">Sold</button>
               <button class="fancy-button space" @click="modifyListing">Modify</button>
@@ -78,7 +78,10 @@ export default {
       this.showListingEditor = true;
     },
     deleteListing() {
-      deleteListing({ id: this.id });
+      deleteListing({ id: this.id }).then(response => {
+        response;
+        this.hidden = true;
+      });
     },
     hideListingEditor() {
       this.showListingEditor = false;

@@ -7,8 +7,11 @@ export async function getAllListings(count = 25) {
     return await response.json();
 }
 
-export async function getUser(id) {
-    const response = await fetch(`${BASE_URL}/user/${id}`);
+export async function getUser(name) {
+    const response = await fetch(`${BASE_URL}/user/${name}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${store.state.token}` },
+    });
     return await response.json();
 }
 
