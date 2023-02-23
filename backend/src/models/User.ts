@@ -18,6 +18,9 @@ export class User {
     @Column()
     email: string = "";
 
+    @Column()
+    admin: boolean = false;
+
     @OneToMany(() => Listing, listing => listing.user)
     listings: Listing[];
 
