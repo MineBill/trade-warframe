@@ -6,6 +6,7 @@ import cors from "cors";
 import { expressjwt, Request as JWTRequest } from "express-jwt";
 import { DataSource } from "typeorm";
 import { User } from "./models/User.js";
+import { Ban } from "./models/Ban.js";
 import { Listing, ListingType } from "./models/Listing.js";
 import { Item } from "./models/Item.js"
 import { verifyJWT, generateJWT, hashPassword, comparePasswords } from "./utils.js"
@@ -19,7 +20,7 @@ const AppDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User, Listing, Item],
+    entities: [User, Listing, Item, Ban],
     synchronize: true
 });
 
