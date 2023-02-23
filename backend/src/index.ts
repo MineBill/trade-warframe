@@ -144,7 +144,7 @@ async function setup() {
             return res.status(400).send({ message: "Listing with id does not exist" });
         }
 
-        if (listing.user.id != req.auth.data.id) {
+        if (!req.auth.data.admin && (listing.user.id != req.auth.data.id)) {
             return res.status(403).send({ message: "User does not own the listing" });
         }
 
@@ -218,6 +218,43 @@ async function setup() {
 
         return res.status(200).send(user);
     })
+
+
+    function getUserFromIdOrName(user: string | number): Promise<User> {
+        const users = AppDataSource.getRepository(User);
+        if (typeof user === "number") {
+            return users.findOne({ where: { id: user } });
+        } else if (typeof user === "string") {
+            return users.findOne({ where: { name: user } });
+        } else {
+            return null;
+        }
+    }
+
+    app.put("/user/ban", authFilter, async (req: JWTRequest, res) => {
+        const userIdOrName = req.body.user;
+        const reason = req.body.reason;
+
+        const users = AppDataSource.getRepository(User);
+        const requestee = await users.findOne({ where: { id: req.auth.data.id } });
+        if (!requestee.admin) {
+            return res.status(403).send({ message: "Only admins are allowed to ban users" });
+        }
+
+        const user = await getUserFromIdOrName(userIdOrName);
+        if (user == null) {
+            return res.status(400).send({ message: "User must be number or string" });
+        }
+
+        let ban = new Ban();
+        ban.admin = requestee;
+        ban.bannedUser = user;
+        ban.reason = reason;
+
+        const bans = AppDataSource.getRepository(Ban);
+        bans.save(ban);
+        return res.status(200).send();
+    });
 
     app.get("/listings/:max", async (req, res) => {
         let max = parseInt(req.params.max)
@@ -339,6 +376,12 @@ async function setup() {
         }
 
         const user: User = result[0];
+
+        const bans = AppDataSource.getRepository(Ban);
+        const bansForUser = await bans.findOne({ where: { bannedUser: { id: user.id } } });
+        if (bansForUser != null) {
+            return res.status(403).send({ message: "You have been banned. :^)" });
+        }
 
         if (!comparePasswords(user.passwordHash, password, user.passwordSalt)) {
             return res.status(404).send({
