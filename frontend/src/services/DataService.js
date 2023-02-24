@@ -74,3 +74,12 @@ export async function deleteListing(data) {
     });
     return await response.json();
 }
+
+export async function userBan(data) {
+    const response = await fetch(`${BASE_URL}/user/ban`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${store.state.token}` },
+        body: JSON.stringify(data)
+    });
+    return await response.json();
+}

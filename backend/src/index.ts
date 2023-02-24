@@ -198,7 +198,7 @@ async function setup() {
         const users = AppDataSource.getRepository(User);
         const user = await users.findOne({ where: { name: name } });
         if (user == null) {
-            return res.status(400).send({message: "User id is invalid"});
+            return res.status(400).send({ message: "User id is invalid" });
         }
 
         const listings = AppDataSource.getRepository(Listing);
@@ -253,7 +253,7 @@ async function setup() {
 
         const bans = AppDataSource.getRepository(Ban);
         bans.save(ban);
-        return res.status(200).send();
+        return res.status(200).send({});
     });
 
     app.get("/listings/:max", async (req, res) => {
