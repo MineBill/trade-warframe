@@ -7,10 +7,11 @@
                 <button @click="register" class="fancy-button">Register</button>
             </div>
             <div v-else>
-                <router-link :to="{name: 'profile', params: {name: userData.name}}" class="username">{{ userData.name }}</router-link>
+                <router-link :to="{ name: 'profile', params: { name: userData.name } }" class="username"
+                    :class="{ admin: userData.admin }">{{ userData.name }}</router-link>
                 <button @click="logout" class="fancy-button">Logout</button>
             </div>
-            <div>{{response}}</div>
+            <div>{{ response }}</div>
         </div>
     </div>
 </template>
@@ -48,6 +49,7 @@ export default {
         loggedIn() {
             return this.$store.state.loggedIn;
         }
+
     },
 
     mounted() {
@@ -65,7 +67,6 @@ export default {
 </script>
 
 <style scoped>
-
 .navigation {
     background-color: blueviolet;
     padding: 5px;
@@ -97,4 +98,7 @@ export default {
     font-weight: bold;
 }
 
+.admin {
+    color: crimson;
+}
 </style>
