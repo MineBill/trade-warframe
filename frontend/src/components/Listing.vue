@@ -1,41 +1,42 @@
-<template><!-- <div>quantity= {{ quantity }}
+<template>
+  <!-- <div>quantity= {{ quantity }}
     price={{ price }}
     userName={{ userName }}
     item={{ item }}</div> -->
-      <div v-if="!hidden" class="container">
-        <div class="inner-container">
-          <div class="card">
-            <img class="item-icon" src="@/assets/logo.png" alt="">
-            <div style="grid-column: 2">
-              <div class="title">
-                {{ item }}
-              </div>
-              <hr />
-              <div class="price_quantity_container">
-                <div class="quantity">
-                  Quantity: {{ quantity }}
-                </div>
-                <div class="price">
-                  Price: {{ price }}
-                </div>
-              </div>
-            </div>
-
+  <div v-if="!hidden" class="container">
+    <div class="inner-container">
+      <div class="card">
+        <img class="item-icon" src="@/assets/logo.png" alt="">
+        <div style="grid-column: 2">
+          <div class="title">
+            {{ item }}
           </div>
-          <div style="height: fit-content">
-            <hr />
-            <router-link :to="{name: 'profile', params: {name: userName}}" class="username">{{ userName }}</router-link>
-            <div class="buttons" v-if="ownsListing">
-              <button class="fancy-button space" @click="soldListing">Sold</button>
-              <button class="fancy-button space" @click="modifyListing">Modify</button>
-              <button class="fancy-button space" @click="deleteListing">Delete</button>
+          <hr />
+          <div class="price_quantity_container">
+            <div class="quantity">
+              Quantity: {{ quantity }}
+            </div>
+            <div class="price">
+              Price: {{ price }}
             </div>
           </div>
         </div>
+
       </div>
-      <ListingEditor v-if="showListingEditor" :isModifying="true" @canceled="hideListingEditor"
-        @completed="listingEditorCompleted" :itemDefault="item" :priceDefault="price" :quantityDefault="quantity"
-        :typeDefault="type" />
+      <div style="height: fit-content">
+        <hr />
+        <router-link :to="{ name: 'profile', params: { name: userName } }" class="username">{{ userName }}</router-link>
+        <div class="buttons" v-if="shouldShowListing">
+          <button class="fancy-button space" @click="soldListing">Sold</button>
+          <button class="fancy-button space" @click="modifyListing" v-if="ownsListing">Modify</button>
+          <button class="fancy-button space" @click="deleteListing">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ListingEditor v-if="showListingEditor" :isModifying="true" @canceled="hideListingEditor"
+    @completed="listingEditorCompleted" :itemDefault="item" :priceDefault="price" :quantityDefault="quantity"
+    :typeDefault="type" />
 </template>
 
 <script>
@@ -99,6 +100,12 @@ export default {
       this.price = data.price;
       this.item = data.item.uniqueName;
       this.type = data.type;
+    },
+  },
+  computed: {
+    shouldShowListing() {
+
+      return this.$store.state.user.admin || this.ownsListing;
     }
   }
 }
