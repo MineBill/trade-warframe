@@ -9,7 +9,7 @@
         <img class="item-icon" src="@/assets/logo.png" alt="">
         <div style="grid-column: 2">
           <div class="title">
-            {{ item }}
+            {{ displayName }}
           </div>
           <hr />
           <div class="price_quantity_container">
@@ -53,6 +53,7 @@ export default {
     priceDefault: Number,
     userName: String,
     itemDefault: String,
+    displayName: String,
     typeDefault: String,
     id: Number,
     ownsListing: Boolean,
@@ -95,6 +96,9 @@ export default {
         price: data.price,
         type: data.type,
         listingId: this.id
+      }).then(response => {
+        response;
+        this.$router.go();
       });
       this.quantity = data.quantity;
       this.price = data.price;
