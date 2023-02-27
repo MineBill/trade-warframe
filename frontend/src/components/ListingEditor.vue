@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { getAllitems } from '@/services/DataService'
+// import { getAllitems } from '@/services/DataService'
 import VueSelect from 'vue-next-select'
 import 'vue-next-select/dist/index.min.css'
 
@@ -63,16 +63,14 @@ export default {
         }
     },
     mounted() {
-        getAllitems().then(data => {
-            this.items = data.map(item => { return { name: item.displayName, unique: item.uniqueName } });
-            const index = this.items.findIndex(i => i.unique == this.item);
-            this.selectedItem = this.items[index];
-            if (this.type != "" || this.type != undefined) {
-                this.typeString = this.type.toLowerCase();
-                this.typeString = this.typeString[0].toUpperCase() + this.typeString.substring(1);
-                console.log(this.typeString);
-            }
-        });
+        this.items = this.$store.state.items;
+        const index = this.items.findIndex(i => i.unique == this.item);
+        this.selectedItem = this.items[index];
+        if (this.type != "" && this.type != undefined) {
+            this.typeString = this.type.toLowerCase();
+            this.typeString = this.typeString[0].toUpperCase() + this.typeString.substring(1);
+            console.log(this.typeString);
+        }
     },
     methods: {
         getMode() {

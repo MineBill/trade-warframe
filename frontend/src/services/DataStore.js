@@ -5,7 +5,8 @@ const store = createStore({
         return {
             token: "",
             loggedIn: false,
-            user: {}
+            user: {},
+            items: []
         };
     },
     mutations: {
@@ -24,6 +25,9 @@ const store = createStore({
             state.user = {};
             state.loggedIn = false;
             localStorage.clear();
+        },
+        setItems(state, items) {
+            state.items = items;
         }
     },
 });
