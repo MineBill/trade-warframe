@@ -19,6 +19,9 @@
             <div class="price">
               Price: {{ price }}
             </div>
+            <div class="type">
+              Type: {{ type }}
+            </div>
           </div>
         </div>
 
