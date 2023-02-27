@@ -12,14 +12,10 @@ export default {
   components: {
     NavigationBar
   },
-  data: () => {
-    return {
-      items: []
-    };
-  },
   mounted() {
     getAllitems().then(data => {
-      this.items = data
+      data = data.map(item => { return { name: item.displayName, unique: item.uniqueName } });
+      this.$store.commit("setItems", data);
     })
   }
 }

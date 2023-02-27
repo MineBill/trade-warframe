@@ -21,8 +21,8 @@
             <button class="fancy-button" type="button" @click="searchBar">Search</button>
             <button class="fancy-button" type="button" @click="newListing">New Listing</button>
         </div>
-        <div v-for="(listing, index) in items" v-bind:key="index">
-            <Listing :itemDefault="listing.item.uniqueName" :priceDefault="listing.price" :quantityDefault="listing.quantity"
+        <div v-for="(listing, index) in listings" v-bind:key="index">
+            <Listing :itemDefault="listing.item.uniqueName" :displayName="listing.item.displayName" :priceDefault="listing.price" :quantityDefault="listing.quantity"
                 :userName="listing.user.name" :typeDefault="listing.type" :id="listing.id" :ownsListing="listing.user.id == this.$store.state.user.id"/>
         </div>
         <div v-if="items == undefined || items.length == 0">
@@ -40,7 +40,10 @@ import ListingEditor from "@/components/ListingEditor.vue"
 
 export default {
     name: 'DisplayListings',
-    data: () => {
+    props: {
+        items: Array
+    },
+    data() {
         return {
             listings: [],
             input: '',
@@ -49,10 +52,14 @@ export default {
             price_min: 0,
             price_max: 0,
             showListingEditor: false,
+            search: false,
         };
     },
-    props: {
-        items: Array
+    updated() {
+        if (!this.search) {
+            this.listings = [...this.items];
+        }
+        this.search = false;
     },
     components: {
         Listing,
@@ -68,6 +75,9 @@ export default {
         },
 
         listingEditorCompleted(data) {
+            console.log(data);
+            data.itemName = data.item.uniqueName;
+
             this.showListingEditor = false;
             createListing(data).then(response => {
                 console.log(response);
@@ -77,14 +87,17 @@ export default {
 
         searchBar: function () {
             if (this.input.length) {
-                for (let item of this.items) {
-                    if (this.input == item.uniqueName) {
-                        getListingsByName(this.input).then(data => {
+                for (let item of this.$store.state.items) {
+                    if (this.input == item.name) {
+                        getListingsByName(item.unique).then(data => {
                             this.listings = this.filterItems(data);
+                            this.search = true;
                         })
                         break;
                     }
                 }
+            }else {
+                this.listings = [...this.items];
             }
         },
 
@@ -95,7 +108,7 @@ export default {
         },
 
         filterPrice: function (items) {
-            if (this.price_min == 0 && this.price_max == 0) {
+            if (this.price_min === 0 && this.price_max === 0) {
                 return items;
             }
 
@@ -110,7 +123,7 @@ export default {
         },
 
         filterQuantity: function (items) {
-            if (this.quantity_min == 0 && this.quantity_max == 0) {
+            if (this.quantity_min === 0 && this.quantity_max === 0) {
                 return items;
             }
 

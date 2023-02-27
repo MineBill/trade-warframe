@@ -10,6 +10,7 @@ import { Ban } from "./models/Ban.js";
 import { Listing, ListingType } from "./models/Listing.js";
 import { Item } from "./models/Item.js"
 import { verifyJWT, generateJWT, hashPassword, comparePasswords } from "./utils.js"
+import Items from "warframe-items";
 
 dotenv.config();
 
@@ -37,6 +38,20 @@ async function setup() {
     app.use(cors());
     app.use(express.json());
 
+    if (process.env.LOAD_ITEMS) {
+        const items = new Items({ category: ['All'] });
+        let count = 0;
+        for (let wfitem of items) {
+            if (wfitem.tradable) {
+                count++;
+                let item = new Item();
+                item.displayName = wfitem.name;
+                item.uniqueName = wfitem.uniqueName.replace(/\//g, "_");
+                AppDataSource.getRepository(Item).save(item);
+            }
+        }
+        console.log(`Found ${count} tradeable items`);
+    }
 
     const authFilter = expressjwt({ secret: process.env.JWT_PRIVATE_KEY, algorithms: ["RS256"] });
 
